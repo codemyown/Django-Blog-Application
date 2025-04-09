@@ -1,5 +1,4 @@
 name: CI
-
 on:
   push:
     branches:
@@ -29,10 +28,10 @@ jobs:
           poetry add black
           poetry run black . .
 
-      # - name: Run tests
-      #   run: |
-      #     cd backend
-      #     poetry run pytest
+      - name: Run tests
+        run: |
+          cd backend
+          poetry run pytest
 
 
       - name: Build Docker image
@@ -51,4 +50,4 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/backend-web:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/postgres:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/nginx:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/nginx:latestd
