@@ -37,6 +37,6 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ajcoder123/backend-web:latest .
-          docker build -t ajcoder123/postgres:latest .
-          docker build -t ajcoder123/nginx:latest .
+          docker build -t ajcoder123/backend-web:latest backend/
+          docker build -t ajcoder123/postgres:latest backend/
+          docker build -t ajcoder123/nginx:latest backend/
