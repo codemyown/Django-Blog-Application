@@ -49,6 +49,6 @@ jobs:
 
       - name: Push image to DockerHub
         run: |
-          docker buildx build -t ajcoder123/backend-web:latest .
-          docker buildx build -t ajcoder123/postgres:latest .
-          docker buildx build -t ajcoder123/nginx:latest .
+          docker build -t  ${{ secrets.DOCKER_USERNAME }}/backend-web:latest .
+          docker build -t  ${{ secrets.DOCKER_USERNAME }}/postgres:latest .
+          docker build -t  ${{ secrets.DOCKER_USERNAME }}/nginx:latest .
