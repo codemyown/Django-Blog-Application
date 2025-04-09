@@ -40,5 +40,9 @@ jobs:
           docker build -t ajcoder123/backend-web:latest backend/
           docker build -t ajcoder123/postgres:latest backend/
           docker build -t ajcoder123/nginx:latest backend
-          
 
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ajcoder123
+          password: ${{ secrets.DOCKER_PASSWORD }}
