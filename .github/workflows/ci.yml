@@ -33,5 +33,6 @@ jobs:
       - name: Run tests
         run: |
           cd backend
+          poetry update package
           poetry add pytest
           poetry run pytest
