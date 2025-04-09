@@ -27,8 +27,8 @@ jobs:
       - name: Lint code with Black
         run: |
           cd backend
-          poetry add --dev black
-          poetry run black --check .
+          poetry add black
+          poetry run black . .
 
       - name: Run tests
         run: |
