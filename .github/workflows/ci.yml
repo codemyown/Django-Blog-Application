@@ -33,3 +33,10 @@ jobs:
       #   run: |
       #     cd backend
       #     poetry run pytest
+
+
+      - name: Build Docker image
+        run: |
+          docker build -t ajcoder123/backend-web:latest .
+          docker build -t ajcoder123/postgres:latest .
+          docker build -t ajcoder123/nginx:latest .
