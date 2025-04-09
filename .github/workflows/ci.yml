@@ -20,17 +20,18 @@ jobs:
 
       - name: Install dependencies with Poetry
         run: |
+          cd backend
           pip install poetry
           poetry install
 
       - name: Lint code with Black
         run: |
+          cd backend
           poetry add --dev black
           poetry run black --check .
 
       - name: Run tests
         run: |
+          cd backend
           poetry add pytest
-          pytest
-
-    
+          poetry run pytest
