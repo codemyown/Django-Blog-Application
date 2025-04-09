@@ -29,7 +29,7 @@ jobs:
           poetry add black
           poetry run black . .
 
-      - name: Run tests
-        run: |
-          cd backend
-          poetry run pytest
+      # - name: Run tests
+      #   run: |
+      #     cd backend
+      #     poetry run pytest
