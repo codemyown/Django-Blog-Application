@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["ajaypawar22112001 <ajay.pawar@reversebits.tech>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
