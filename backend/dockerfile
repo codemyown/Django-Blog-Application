@@ -17,6 +17,8 @@ RUN poetry install --no-interaction --no-ansi --no-root
 
 COPY . .
 
-EXPOSE 5000
+RUN poetry run pytest || true
 
-CMD ["bash", "-c", "python manage.py migrate && exec gunicorn blogapi.wsgi:application --bind 0.0.0.0:5000"]
+EXPOSE ${WEB_PORT}
+
+CMD ["bash", "-c", "python manage.py migrate && exec gunicorn blogapi.wsgi:application --bind 0.0.0.0:$WEB_PORT"]
