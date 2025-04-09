@@ -62,7 +62,6 @@ class Comment(models.Model):
         author (ForeignKey): The author who made the comment.
         content (TextField): The actual comment text.
         created_at (DateTimeField): Timestamp when the comment was created.
-        updated_at (DateTimeField): Timestamp when the comment was last updated.
     """
 
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
