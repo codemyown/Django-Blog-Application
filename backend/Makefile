@@ -16,13 +16,5 @@ shell:
 	poetry run python manage.py shell
 
 test:
-	poetry run python manage.py test
-
-test-unit:
-	poetry run python manage.py test blog/tests/unit
-
-test-integration:
-	poetry run python manage.py test blog/tests/integration
-
-test-api:
-	poetry run python manage.py test blog/tests/api
+	poetry run pytest
+	
