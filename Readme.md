@@ -136,6 +136,48 @@ Follow these steps for a local development environment:
    make test-api
    ```
 
+## Testing with Postman
+
+Follow these steps to test the API endpoints using Postman:
+
+1. Import the collection:
+   - In Postman, click on "Import" and select the Postman collection file provided with this project
+
+2. Import the environment variables:
+   - Click on "Import" again and select the environment variables file
+   - This will load all the necessary variables for testing
+
+3. Configure the environment:
+   - Set the `host:port` value in the environment variables
+   - Make sure to select and activate the environment for the current collection
+
+4. Authentication flow:
+   - Navigate to the "Authentication" folder in the Blog API collection
+   - First, use the "Register" endpoint with username, email, and password
+   - A status code of 201 indicates successful registration
+   - Next, use the "Login" endpoint with your username and password
+
+5. Configure token authentication:
+   - After successful login, the API will return an access token
+   - Configure this token in the Bearer Authentication settings for the collection
+   - This will authenticate all subsequent requests
+
+6. Testing Author endpoints:
+   - Go to the "Author" section to get or update author details
+
+7. Testing Posts endpoints:
+   - Navigate to the "Posts" section to interact with blog posts
+   - Use "Get All Posts" to retrieve all published posts
+   - Create a new post using "Create Post" with title, content, and image upload
+   - View specific posts with "Get Post by ID"
+   - View your own posts with "Get My Posts"
+   - Update existing posts with "Update Post"
+
+8. Testing Comments:
+   - Within the Posts section, you can interact with post comments
+   - Add comments to posts using the "Add Comment" endpoint
+   - View and manage comments for specific posts
+
 ## Troubleshooting
 
 If you encounter any issues, check that:
@@ -144,3 +186,4 @@ If you encounter any issues, check that:
 - All environment variables are correctly set
 - No other services are using the specified ports
 - Poetry is correctly installed and activated
+- Postman environment variables are correctly set and the environment is active
