@@ -59,7 +59,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = os.getenv("FRONTEND_URL", "")
+CORS_ALLOWED_ORIGINS = ["http://localhost:8000", "http://backend.local"]
+
 ROOT_URLCONF = "blogapi.urls"
 
 TEMPLATES = [
@@ -125,8 +126,6 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-STATIC_URL = "/static/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/images/products/download/"
-
-STATICFILES_DIRS = [BASE_DIR, "static"]
+# STATIC_URL = "/static/"
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+# MEDIA_URL = "/images/products/download/"
