@@ -31,7 +31,7 @@ jobs:
       - name: Run tests
         run: |
           cd backend
-          poetry run pytest
+          pytest
 
 
       - name: Build Docker image
