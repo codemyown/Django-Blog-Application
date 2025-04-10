@@ -45,4 +45,4 @@ jobs:
 
       - name: Push image to DockerHub
         run: |
-          docker push ajcoder123/postgres:latest
+          docker push ajcoder123/backend-web:latest
