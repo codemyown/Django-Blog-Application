@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   db:
-    image: ajcoder123/postgres:latest
+    image: postgres:latest
     container_name: postgres-database
     env_file:
       - .env
@@ -26,7 +26,7 @@ services:
       - db
 
   nginx:
-    image: ajcoder123/nginx:latest
+    image: nginx:latest
     container_name: nginx-proxy
     ports:
       - "80:80"
