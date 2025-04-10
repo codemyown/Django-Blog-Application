@@ -34,12 +34,12 @@ jobs:
           poetry run pytest
 
 
-      - name: Build Docker image
+      - name: Build all images
         run: |
-          export DOCKER_BUILDKIT=0
           docker build -t ${{ secrets.DOCKER_USERNAME }}/backend-web:latest backend/
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/postgres:latest backend/
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/nginx:latest backend/
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/postgres:latest postgres/
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/nginx:latest nginx/
+
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
