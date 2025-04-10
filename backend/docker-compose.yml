@@ -16,7 +16,7 @@ services:
       - "5435:${POSTGRES_PORT}"
 
   web:
-    image: ajcoder123/backend-web
+    build: .
     container_name: backend-app
     env_file:
       - .env
