@@ -38,6 +38,119 @@ Before proceeding with either Docker or local setup, you need to configure your 
    SECRET_KEY=your_django_secret_key
    ```
 
+## Quick Start with Docker Hub Images
+
+For a quick start without cloning the repository or setting up the environment manually, you can use the pre-built Docker images from Docker Hub:
+
+1. Create a new directory for your project and navigate to it:
+   ```
+   mkdir blog-api && cd blog-api
+   ```
+
+2. Create a `docker-compose.yml` file with the following content:
+   ```yaml
+   version: '3.8'
+   services:
+     db:
+       image: ajcoder123/postgres:latest
+       container_name: postgres-database
+       environment:
+         POSTGRES_USER: "vipul"  # do not change it
+         POSTGRES_PASSWORD: "pawar"  # do not change it
+         POSTGRES_DB: "testDB"  # do not change it
+       ports:
+         - "5435:5432"  # do not change the creds
+     
+     web:
+       image: ajcoder123/backend-web
+       container_name: backend-app
+       ports:
+         - "5000:5000"
+       depends_on:
+         - db
+     
+     nginx:
+       image: nginx:latest
+       container_name: nginx-proxy
+       ports:
+         - "80:80"
+       depends_on:
+         - web
+       volumes:
+         - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+   volumes:
+     postgres_data:
+       driver: local
+   ```
+
+3. Create a directory for Nginx configuration:
+   ```
+   mkdir -p nginx
+   ```
+
+4. Create a default Nginx configuration file:
+   ```
+   touch nginx/default.conf
+   ```
+
+5. Add the following configuration to `nginx/default.conf`:
+   ```
+   server {
+       listen 80;
+       
+       location / {
+           proxy_pass http://web:5000;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+       }
+   }
+   ```
+
+6. Start the Docker containers:
+   ```
+   docker-compose up --build -d
+   ```
+
+7. The application will be available at:
+   - API: http://localhost:5000
+   - Web interface (via Nginx): http://localhost
+
+## CI/CD Workflow
+
+This project uses GitHub Actions for continuous integration and deployment. Here's the workflow process:
+
+1. Code Checkout:
+   - The workflow checks out the latest code from the repository
+
+2. Python Setup:
+   - Sets up the specified Python version (e.g., Python 3.9)
+   - Configures the Python environment
+
+3. Dependencies Installation:
+   - Installs Poetry for dependency management
+   - Installs all project dependencies using Poetry
+
+4. Code Linting:
+   - Runs Black code formatter to ensure code style consistency
+   - Checks that all code meets the project's style guidelines
+
+5. Test Execution:
+   - Runs all test cases with pytest
+   - Includes unit tests, integration tests, and API tests
+   - Generates test coverage reports
+
+6. Docker Login:
+   - Authenticates with Docker Hub using GitHub Secrets
+   - Prepares for image push
+
+7. Build and Push Docker Image:
+   - Builds the Docker image with the current code
+   - Tags the image appropriately (e.g., latest, version number)
+   - Pushes the image to Docker Hub repository
+
+You can check the workflow status in the GitHub Actions tab of the repository. Each push to the main branch triggers this workflow automatically.
+
 ## Docker Setup Instructions
 
 Follow these steps to set up the backend using Docker:
