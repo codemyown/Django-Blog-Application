@@ -36,8 +36,6 @@ jobs:
       - name: Build all images
         run: |
           docker build -t ajcoder123/backend-web:latest backend/
-          docker build -t ajcoder123/postgres:latest postgres/
-          docker build -t ajcoder123/nginx:latest nginx/
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
@@ -47,6 +45,4 @@ jobs:
 
       - name: Push image to DockerHub
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/backend-web:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/postgres:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/nginx:latest
