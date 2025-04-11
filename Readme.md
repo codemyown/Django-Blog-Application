@@ -38,7 +38,7 @@ The fastest way to get the entire application running locally is using Docker:
    version: '3.8'
    services:
      db:
-       image: ajcoder123/postgres:latest
+       image: postgres:latest
        container_name: postgres-database
        environment:
          POSTGRES_USER: "vipul"
