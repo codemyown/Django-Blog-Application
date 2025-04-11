@@ -123,6 +123,9 @@ class PostViewSet(viewsets.ModelViewSet):
         Save a new post with the logged-in user as author.
         """
         image = self.request.FILES.get("image")
+        author = getattr(self.request.user, "author", None)
+        if not author:
+            Author.objects.create(user=self.request.user)
         serializer.save(author=self.request.user.author, image=image)
 
     def check_author_permission(self, post):
