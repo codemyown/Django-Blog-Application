@@ -2,3 +2,4 @@ backend/.env
 
 actions-runner/
 frontend/node_modules/
+.env

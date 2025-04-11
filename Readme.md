@@ -1,53 +1,39 @@
-# Backend Setup Guide
+# Blog Application Setup Guide
 
-## Environment Setup
+This repository contains a full-stack blog application with a Django backend API and React frontend. This guide will walk you through setting up both components.
 
-Before proceeding with either Docker or local setup, you need to configure your environment:
+## Table of Contents
 
-1. Navigate to the backend directory:
-   ```
-   cd backend/
-   ```
+- [Architecture Overview](#architecture-overview)
+- [Quick Start with Docker](#quick-start-with-docker)
+- [Backend Setup](#backend-setup)
+  - [Local Development Setup](#local-development-setup)
+  - [Testing the API](#testing-the-api)
+- [Frontend Setup](#frontend-setup)
+  - [Installation](#installation)
+  - [Available Scripts](#available-scripts)
+- [Testing](#testing)
+- [Kubernetes Deployment](#kubernetes-deployment)
+- [Troubleshooting](#troubleshooting)
+- [CI/CD Pipeline](#cicd-pipeline)
 
-2. Create your environment file:
-   - Copy the contents from `.env.example` to a new file named `.env`
-   ```
-   cp .env.example .env
-   ```
-   - Update the following configuration values in the .env file:
+## Architecture Overview
 
-   ```
-   # Environment settings
-   DEBUG=True  # Set to False in production
+This application consists of:
+- **Backend**: Django REST API with PostgreSQL database
+- **Frontend**: React application created with Create React App
+- **Deployment**: Kubernetes orchestration for container management
 
-   # PostgreSQL Database
-   POSTGRES_USER=your_db_user
-   POSTGRES_PASSWORD=your_db_password
-   POSTGRES_DB=your_db_name
-   POSTGRES_HOST=your_db_host  # Use 'localhost' for local setup
-   POSTGRES_PORT=5432
+## Quick Start with Docker
 
-   # Web Port
-   WEB_PORT=your_web_port
+The fastest way to get the entire application running locally is using Docker:
 
-   # JWT Token Lifetimes (in minutes/days)
-   ACCESS_TOKEN_LIFETIME=time_in_minutes
-   REFRESH_TOKEN_LIFETIME=time_in_minutes
-
-   # Django Secret Key
-   SECRET_KEY=your_django_secret_key
+1. Create a project directory and navigate to it:
+   ```bash
+   mkdir blog-app && cd blog-app
    ```
 
-## Quick Start with Docker Hub Images
-
-For a quick start without cloning the repository or setting up the environment manually, you can use the pre-built Docker images from Docker Hub:
-
-1. Create a new directory for your project and navigate to it:
-   ```
-   mkdir blog-api && cd blog-api
-   ```
-
-2. Create a `docker-compose.yml` file with the following content:
+2. Create a `docker-compose.yml` file:
    ```yaml
    version: '3.8'
    services:
@@ -55,13 +41,15 @@ For a quick start without cloning the repository or setting up the environment m
        image: ajcoder123/postgres:latest
        container_name: postgres-database
        environment:
-         POSTGRES_USER: "vipul"  # do not change it
-         POSTGRES_PASSWORD: "pawar"  # do not change it
-         POSTGRES_DB: "testDB"  # do not change it
+         POSTGRES_USER: "vipul"
+         POSTGRES_PASSWORD: "pawar"
+         POSTGRES_DB: "testDB"
        ports:
-         - "5435:5432"  # do not change the creds
+         - "5435:5432"
+       volumes:
+         - postgres_data:/var/lib/postgresql/data
      
-     web:
+     backend:
        image: ajcoder123/backend-web
        container_name: backend-app
        ports:
@@ -69,13 +57,22 @@ For a quick start without cloning the repository or setting up the environment m
        depends_on:
          - db
      
+     frontend:
+       image: ajcoder123/frontend-web
+       container_name: frontend-app
+       ports:
+         - "3000:3000"
+       depends_on:
+         - backend
+     
      nginx:
        image: nginx:latest
        container_name: nginx-proxy
        ports:
          - "80:80"
        depends_on:
-         - web
+         - backend
+         - frontend
        volumes:
          - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
 
@@ -84,219 +81,252 @@ For a quick start without cloning the repository or setting up the environment m
        driver: local
    ```
 
-3. Create a directory for Nginx configuration:
-   ```
+3. Create an Nginx configuration:
+   ```bash
    mkdir -p nginx
    ```
 
-4. Create a default Nginx configuration file:
-   ```
-   touch nginx/default.conf
-   ```
-
-5. Add the following configuration to `nginx/default.conf`:
+4. Create `nginx/default.conf`:
    ```
    server {
        listen 80;
        
+       location /api/ {
+           proxy_pass http://backend:5000;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+       }
+       
        location / {
-           proxy_pass http://web:5000;
+           proxy_pass http://frontend:3000;
            proxy_set_header Host $host;
            proxy_set_header X-Real-IP $remote_addr;
        }
    }
    ```
 
-6. Start the Docker containers:
-   ```
+5. Start the containers:
+   ```bash
    docker-compose up --build -d
    ```
 
-7. The application will be available at:
-   - API: http://localhost:5000
-   - Web interface (via Nginx): http://localhost
+The application will be available at:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
 
-## CI/CD Workflow
+## Backend Setup
 
-This project uses GitHub Actions for continuous integration and deployment. Here's the workflow process:
+### Local Development Setup
 
-1. Code Checkout:
-   - The workflow checks out the latest code from the repository
+For local development with more control:
 
-2. Python Setup:
-   - Sets up the specified Python version (e.g., Python 3.9)
-   - Configures the Python environment
-
-3. Dependencies Installation:
-   - Installs Poetry for dependency management
-   - Installs all project dependencies using Poetry
-
-4. Code Linting:
-   - Runs Black code formatter to ensure code style consistency
-   - Checks that all code meets the project's style guidelines
-
-5. Test Execution:
-   - Runs all test cases with pytest
-   - Includes unit tests, integration tests, and API tests
-   - Generates test coverage reports
-
-6. Docker Login:
-   - Authenticates with Docker Hub using GitHub Secrets
-   - Prepares for image push
-
-7. Build and Push Docker Image:
-   - Builds the Docker image with the current code
-   - Tags the image appropriately (e.g., latest, version number)
-   - Pushes the image to Docker Hub repository
-
-You can check the workflow status in the GitHub Actions tab of the repository. Each push to the main branch triggers this workflow automatically.
-
-## Docker Setup Instructions
-
-Follow these steps to set up the backend using Docker:
-
-1. Build and start the Docker containers:
-   ```
-   docker-compose up --build -d
+1. **Set up the environment**
+   ```bash
+   # Clone the repository (if available)
+   git clone [repository-url]
+   cd [repository-name]/backend
+   
+   # Create environment file
+   cp .env.example .env
    ```
 
-2. Access the application:
-   - Open your browser or Postman and navigate to `localhost:5000` (or your configured port)
-   - For Postman usage, set up environment variables with the appropriate values
-
-3. Please let me know if any error occurs during the setup process.
-
-## Local Development Setup
-
-Follow these steps for a local development environment:
-
-1. Install PostgreSQL and Beekeeper (optional):
+2. **Configure your `.env` file with these variables:**
    ```
-   # For Ubuntu/Debian
+   # Environment settings
+   DEBUG=True  # Set to False in production
+
+   # PostgreSQL Database
+   POSTGRES_USER=your_db_user
+   POSTGRES_PASSWORD=your_db_password
+   POSTGRES_DB=your_db_name
+   POSTGRES_HOST=localhost
+   POSTGRES_PORT=5432
+
+   # Web Port
+   WEB_PORT=5000
+
+   # JWT Token Lifetimes (in minutes)
+   ACCESS_TOKEN_LIFETIME=60
+   REFRESH_TOKEN_LIFETIME=1440
+
+   # Django Secret Key
+   SECRET_KEY=your_django_secret_key
+
+   # Frontend URL
+   FRONTEND_URL=your_frontend_url
+   ```
+
+3. **Install PostgreSQL:**
+   ```bash
+   # Ubuntu/Debian
    sudo apt update
    sudo apt install postgresql postgresql-contrib
    
-   # For MacOS using Homebrew
-   brew install postgresql
-   
-   # Start PostgreSQL service
-   # Ubuntu/Debian
-   sudo systemctl start postgresql
    # MacOS
+   brew install postgresql
    brew services start postgresql
    ```
-   
-   You can download Beekeeper Studio (a database management tool) from the [official website](https://www.beekeeperstudio.io/).
 
-2. Configure PostgreSQL:
-   ```
-   # Create a new database user
+4. **Configure database:**
+   ```bash
+   # Create a database user
    sudo -u postgres createuser --interactive --pwprompt
    
-   # Create a new database
+   # Create a database
    sudo -u postgres createdb your_db_name
    ```
 
-3. For local setup, make sure to set `POSTGRES_HOST=localhost` in your .env file.
-
-4. Install Python and Poetry:
-   ```
-   # Install Python (if not already installed)
-   # Ubuntu/Debian
-   sudo apt install python3 python3-pip
-   
-   # MacOS
-   brew install python
-   
+5. **Install Python dependencies:**
+   ```bash
    # Install Poetry
    curl -sSL https://install.python-poetry.org | python3 -
-   ```
-
-5. Activate Poetry shell:
-   ```
+   
+   # Install dependencies
    poetry shell
-   ```
-
-6. Install dependencies:
-   ```
    poetry install
    ```
 
-7. Run the application:
-   ```
-   # Run database migrations
+6. **Run migrations and start the server:**
+   ```bash
+   # Run migrations
    make migrate
-   
-   # Start the server
-   make run
    
    # Create a superuser
    make superuser
+   
+   # Start the server
+   make run
    ```
 
-8. Testing commands:
+### Testing the API
+
+You can test the API endpoints using Postman:
+
+1. Import the Postman collection (if provided with the project)
+
+2. Configure environment variables:
+   - Set the base URL (e.g., `http://localhost:5000`)
+
+3. Authentication flow:
+   - Register a new user: `POST /api/auth/register/`
+   - Login to get token: `POST /api/auth/login/`
+   - Use the token for authenticated requests
+
+4. Test the endpoints:
+   - Get all posts: `GET /api/posts/`
+   - Create a post: `POST /api/posts/`
+   - Get a specific post: `GET /api/posts/{id}/`
+   - Update a post: `PUT /api/posts/{id}/`
+   - Comment on a post: `POST /api/posts/{id}/comments/`
+
+## Frontend Setup
+
+### Installation
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
    ```
-   # Run all tests
-   make test
-   
-   # Run unit tests only
-   make test-unit
-   
-   # Run integration tests only
-   make test-integration
-   
-   # Run API tests only
-   make test-api
+
+2. Install dependencies:
+   ```bash
+   npm install
    ```
 
-## Testing with Postman
+### Available Scripts
 
-Follow these steps to test the API endpoints using Postman:
+In the frontend directory, you can run:
 
-1. Import the collection:
-   - In Postman, click on "Import" and select the Postman collection file provided with this project
+- **`npm start`**: Runs the app in development mode at [http://localhost:3000](http://localhost:3000)
+- **`npm run build`**: Builds the app for production in the `build` folder
+- **`npm run eject`**: Extracts all configuration files (one-way operation)
 
-2. Import the environment variables:
-   - Click on "Import" again and select the environment variables file
-   - This will load all the necessary variables for testing
+## Testing
 
-3. Configure the environment:
-   - Set the `host:port` value in the environment variables
-   - Make sure to select and activate the environment for the current collection
+To run tests for the project:
 
-4. Authentication flow:
-   - Navigate to the "Authentication" folder in the Blog API collection
-   - First, use the "Register" endpoint with username, email, and password
-   - A status code of 201 indicates successful registration
-   - Next, use the "Login" endpoint with your username and password
+### Backend Tests
+```bash
+cd backend
+make test
+```
 
-5. Configure token authentication:
-   - After successful login, the API will return an access token
-   - Configure this token in the Bearer Authentication settings for the collection
-   - This will authenticate all subsequent requests
 
-6. Testing Author endpoints:
-   - Go to the "Author" section to get or update author details
 
-7. Testing Posts endpoints:
-   - Navigate to the "Posts" section to interact with blog posts
-   - Use "Get All Posts" to retrieve all published posts
-   - Create a new post using "Create Post" with title, content, and image upload
-   - View specific posts with "Get Post by ID"
-   - View your own posts with "Get My Posts"
-   - Update existing posts with "Update Post"
+## Kubernetes Deployment
 
-8. Testing Comments:
-   - Within the Posts section, you can interact with post comments
-   - Add comments to posts using the "Add Comment" endpoint
-   - View and manage comments for specific posts
+This application is deployed to production using Kubernetes:
+
+### Kubernetes Configuration Files
+
+The application uses the following Kubernetes configuration files:
+- `deployment.yml` - Defines the deployment configuration for both frontend and backend
+- `service.yml` - Defines the services for accessing the applications
+- `ingress.yml` - Configures the ingress controller for external access
+- `secrets.yml` - Contains sensitive information like database credentials
+
+### Deploying to Kubernetes
+
+To deploy the application to a Kubernetes cluster:
+
+```bash
+# Apply all Kubernetes configurations
+kubectl apply -f k8s/
+```
+
+This single command will apply all the configuration files in the kubernetes directory.
+
+### Verifying the Deployment
+
+After deployment, verify that all resources are running correctly:
+
+```bash
+# Check the status of all pods
+kubectl get pods
+
+# Check the status of all services
+kubectl get services
+
+# Check the status of the ingress
+kubectl get ingress
+
+# Check the deployment status
+kubectl get deployments
+```
 
 ## Troubleshooting
 
-If you encounter any issues, check that:
-- Docker is properly installed and running (for Docker setup)
-- PostgreSQL is properly installed and running (for local setup)
-- All environment variables are correctly set
-- No other services are using the specified ports
-- Poetry is correctly installed and activated
-- Postman environment variables are correctly set and the environment is active
+### Backend Issues
+- **Database connection errors**: Check your PostgreSQL settings and credentials
+- **Port conflicts**: Ensure ports 5000 and 80 are available
+- **Migrations failing**: Run `make migrate` in the backend directory
+
+### Frontend Issues
+- **Node modules errors**: Delete `node_modules` folder and run `npm install`
+- **API connection issues**: Check CORS settings in the backend
+- **Build errors**: Check console for specific error messages
+
+### Kubernetes Issues
+- **Pods in pending state**: Check for resource constraints or PVC issues
+- **CrashLoopBackOff errors**: Check container logs with `kubectl logs <pod-name>`
+- **Ingress not working**: Verify that the ingress controller is properly installed and configured
+- **Service connection issues**: Check service selectors and port configurations
+
+## CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+1. **Workflow Process**:
+   - Code checkout from repository
+   - Python environment setup
+   - Dependencies installation with Poetry
+   - Code linting with Black
+   - Test execution with pytest
+   - Docker image building and pushing to Docker Hub
+   - Kubernetes deployment to production cluster
+
+2. **Monitoring**:
+   - Check workflow status in the GitHub Actions tab
+   - Each push to the main branch triggers the workflow automatically
+
+The CI/CD pipeline ensures code quality and automates the deployment process for both frontend and backend components.
