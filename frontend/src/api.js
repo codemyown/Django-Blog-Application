@@ -1,15 +1,21 @@
-const BASE_URL = process.env.REACT_APP_API_URL;
+const BASE_URL = "http://localhost:5000";
 
 console.log("Calling API:", `${BASE_URL}/posts/`);
 
 export const fetchPosts = async () => {
-  const res = await fetch(`${BASE_URL}/posts/`);
+  const token = localStorage.getItem("access_token");
+  const res = await fetch(`${BASE_URL}/posts/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   if (!res.ok) {
     console.warn("Failed to fetch posts:", res.status);
     return [];
   }
   return res.json();
 };
+
 
 export const registerUser = async (email, username, password) => {
   const formData = new FormData();
