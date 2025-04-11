@@ -31,6 +31,12 @@ class RegisterView(APIView):
     permission_classes = []
 
     def post(self, request):
+        """
+        Register a new user.
+
+        Creates user and author if data is valid.
+        Returns success or error response.
+        """
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -61,6 +67,11 @@ class AuthorAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """
+        Get the logged-in user's author profile.
+
+        Returns author data or not found message.
+        """
         author = Author.objects.filter(user=request.user).first()
         if not author:
             return Response({"detail": "Author profile not found."}, status=404)
@@ -68,6 +79,11 @@ class AuthorAPIView(APIView):
         return Response(serializer.data)
 
     def put(self, request):
+        """
+        Update the logged-in user's author profile.
+
+        Returns updated data or errors.
+        """
         author = Author.objects.filter(user=request.user).first()
         if not author:
             return Response({"detail": "Author profile not found."}, status=404)
@@ -97,22 +113,38 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        """
+        Get all posts.
+        """
         return Post.objects.all()
 
     def perform_create(self, serializer):
+        """
+        Save a new post with the logged-in user as author.
+        """
         image = self.request.FILES.get("image")
         serializer.save(author=self.request.user.author, image=image)
 
     def check_author_permission(self, post):
+        """
+        Check if the logged-in user is the post's author.
+        """
         if post.author != self.request.user.author:
             raise PermissionDenied("You can only modify your own posts.")
 
     def update(self, request, *args, **kwargs):
+        """
+        Update a post if the user is the author.
+        """
+
         post = self.get_object()
         self.check_author_permission(post)
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
+        """
+        Delete a post if the user is the author.
+        """
         post = self.get_object()
         self.check_author_permission(post)
         return super().destroy(request, *args, **kwargs)
@@ -120,7 +152,7 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"], url_path="my")
     def my_posts(self, request):
         """
-        GET /posts/my/ - List posts created by the current user.
+        List posts created by the logged-in user.
         """
         posts = Post.objects.filter(author=request.user.author)
         serializer = self.get_serializer(posts, many=True)
@@ -175,6 +207,9 @@ class HealthCheckView(APIView):
     permission_classes = []
 
     def get(self, request):
+        """
+        Health check endpoint. Returns status OK.
+        """
         return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
 
@@ -190,4 +225,7 @@ class ReadinessCheckView(APIView):
     permission_classes = []
 
     def get(self, request):
+        """
+        Readiness check endpoint. Returns status ready.
+        """
         return Response({"status": "ready"}, status=status.HTTP_200_OK)

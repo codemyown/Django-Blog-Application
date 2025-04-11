@@ -1,27 +1,20 @@
+include .env
 
 run:
-    poetry run python manage.py runserver 7000
+	poetry run python manage.py runserver 0.0.0.0:$(WEB_PORT)
 
 makemigrations:
-    poetry run python manage.py makemigrations
+	poetry run python manage.py makemigrations
 
 migrate:
-    poetry run python manage.py migrate
+	poetry run python manage.py migrate
 
 superuser:
-    poetry run python manage.py createsuperuser
+	poetry run python manage.py createsuperuser
 
 shell:
-    poetry run python manage.py shell
+	poetry run python manage.py shell
 
 test:
-    poetry run python manage.py test
-
-test-unit:
-    poetry run python manage.py test blog/tests/unit
-
-test-integration:
-    poetry run python manage.py test blog/tests/integration
-
-test-api:
-    poetry run python manage.py test blog/tests/api
+	poetry run pytest
+	
