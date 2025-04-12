@@ -57,7 +57,7 @@ export const loginUser = async (username, password) => {
 
 export const createPost = async (formData) => {
   const token = localStorage.getItem("access_token");
-  console.log("Using token:", token); // ✅ Debug
+  console.log("Using token:", token);
 
   if (!token) {
     return { error: "User not authenticated. No access token found." };
@@ -66,7 +66,7 @@ export const createPost = async (formData) => {
   const res = await fetch(`${BASE_URL}/posts/`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`, // ✅ Bearer format is required
+      Authorization: `Bearer ${token}`, 
     },
     body: formData,
   });

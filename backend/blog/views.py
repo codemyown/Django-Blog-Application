@@ -86,7 +86,10 @@ class AuthorAPIView(APIView):
         """
         author = Author.objects.filter(user=request.user).first()
         if not author:
-            return Response({"detail": "Author profile not found."}, status=404)
+            return Response(
+                {"detail": "Author profile not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
         serializer = AuthorSerializer(author, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()

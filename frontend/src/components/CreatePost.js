@@ -14,7 +14,7 @@ const CreatePost = () => {
     formData.append("content", content);
     if (image) formData.append("image", image);
 
-    const result = await createPost(formData); // ✅ declared here
+    const result = await createPost(formData);
 
     console.log("Post creation result:", result); // ✅ result is in scope
     alert(JSON.stringify(result, null, 2)); // ✅ only use it after it's defined

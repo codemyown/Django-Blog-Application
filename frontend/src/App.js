@@ -13,7 +13,7 @@ function App() {
     const now = Math.floor(Date.now() / 1000);
 
     if (!token || now > exp) {
-      alert("⏰ Session expired. Please log in again.");
+      alert(" Session expired. Please log in again.");
       localStorage.clear();
       setIsLoggedIn(false);
     } else {
@@ -38,7 +38,7 @@ function App() {
           borderRight: "2px solid #39ff14",
         }}
       >
-        <h1 style={{ fontSize: "2rem", color: "#39ff14" }}>📝 My Blog</h1>
+        <h1 style={{ fontSize: "2rem", color: "#39ff14" }}>My Blog</h1>
 
         {!isLoggedIn ? (
           <>
