@@ -23,7 +23,7 @@ jobs:
           kubectl config use-context minikube
           kubectl config current-context
 
-      - name: Apply Kubernetes manifests
+      - name: Apply Kubernetes manifests file
         run: |
           kubectl apply -f k8s/
 
