@@ -13,11 +13,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Start Minikube
+        run: |
+          minikube status || minikube start
+
       - name: Set up kubectl
         run: |
           kubectl version --client
+          kubectl config use-context minikube
           kubectl config current-context
 
       - name: Apply Kubernetes manifests
         run: |
           kubectl apply -f k8s/
+
+      - name: Check Ingress Controller
+        run: |
+          kubectl get pods -n ingress-nginx
+
+      - name: Port Forward Ingress
+        run: |
+          nohup kubectl port-forward svc/ingress-nginx-controller -n ingress-nginx 8081:80 &
