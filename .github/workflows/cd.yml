@@ -33,4 +33,4 @@ jobs:
 
       - name: Port Forward Ingress
         run: |
-          nohup kubectl port-forward svc/ingress-nginx-controller -n ingress-nginx 8081:80 &
+          nohupk
