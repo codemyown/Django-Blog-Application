@@ -79,7 +79,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "blogapi.wsgi.application"
 
-
 if "pytest" in sys.argv[0]:
     DATABASES = {
         "default": {
@@ -91,11 +90,11 @@ else:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("POSTGRES_DB"),
-            "USER": os.getenv("POSTGRES_USER"),
-            "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-            "HOST": os.getenv("POSTGRES_HOST"),
-            "PORT": os.getenv("POSTGRES_PORT"),
+            "NAME": os.getenv("POSTGRES_DB", "database"),
+            "USER": os.getenv("POSTGRES_USER", "user"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD", "pass"),
+            "HOST": os.getenv("POSTGRES_HOST", "postgres-service"),
+            "PORT": os.getenv("POSTGRES_PORT", "5432"),
         }
     }
 
@@ -121,9 +120,7 @@ USE_I18N = True
 USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 STATIC_URL = "/static/"
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-MEDIA_URL = "/images/products/download/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+# MEDIA_URL = "/images/products/download/"

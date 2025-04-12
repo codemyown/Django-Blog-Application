@@ -12,13 +12,12 @@ RUN pip install --upgrade pip && pip install poetry
 COPY pyproject.toml poetry.lock* ./
 
 RUN poetry config virtualenvs.create false 
-
 RUN poetry install --no-interaction --no-ansi --no-root
 
 COPY . .
 
-RUN poetry run pytest || true
+RUN python manage.py collectstatic --noinput
 
-EXPOSE ${WEB_PORT}
+EXPOSE 5000
 
-CMD ["bash", "-c", "python manage.py migrate && exec gunicorn blogapi.wsgi:application --bind 0.0.0.0:$WEB_PORT"]
+CMD ["bash", "-c", "python manage.py migrate && exec gunicorn blogapi.wsgi:application --bind 0.0.0.0:5000"]
