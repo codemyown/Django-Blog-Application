@@ -1,33 +1,47 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-deployment
+  name: backend-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: backend
+      app: backend-app
   template:
     metadata:
       labels:
-        app: backend
+        app: backend-app
     spec:
       containers:
-        - name: backend
+        - name: backend-app
           image: ajcoder123/backend-web
           ports:
-            - containerPort: 8000
-          resources:
-            limits:
-              memory: "256Mi"
-              cpu: "500m"
-            requests:
-              memory: "128Mi"
-              cpu: "250m"
-          env:
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_USER
-            
+            - containerPort: 5000
+          envFrom:
+            - secretRef:
+                name: app-secrets
+         
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: app-secrets
